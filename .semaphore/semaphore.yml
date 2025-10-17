@@ -25,6 +25,7 @@ blocks:
         - name: Deploy
           commands:
             - checkout
+            - cd 1-k8s-deployment
             - kubectl get nodes
             - kubectl create namespace "tomfern" || true
             - kubectl config set-context --current --namespace=tomfern
