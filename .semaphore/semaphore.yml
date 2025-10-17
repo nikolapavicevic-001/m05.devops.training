@@ -29,7 +29,7 @@ blocks:
             - kubectl get nodes
             - kubectl create namespace "tomfern" || true
             - kubectl config set-context --current --namespace=tomfern
-            - kubectl apply -f deployment.yml
+            - kubectl apply -f deployment.tomfern.yml
             - kubectl apply -f service.yml
             - kubectl rollout status deployment/flask-app
   - name: Kubernetes verify
