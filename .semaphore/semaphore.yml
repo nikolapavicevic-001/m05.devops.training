@@ -14,7 +14,7 @@ blocks:
             - cd 1-k8s-deployment
             - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
             - 'docker build -t $DOCKER_USERNAME/my-flask-image:latest .'
-            - 'docker push $DOCKER_USERNAME/flask-app:latest'
+            - 'docker push $DOCKER_USERNAME/my-flask-image:latest'
       secrets:
         - name: dockerhub
   - name: Kubernetes deploy
