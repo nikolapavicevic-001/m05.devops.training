@@ -1,0 +1,41 @@
+version: v1.0
+name: Initial Pipeline
+agent:
+  machine:
+    type: f1-standard-2
+    os_image: ubuntu2204
+blocks:
+  - name: Docker build
+    task:
+      jobs:
+        - name: Build
+          commands:
+            - checkout
+            - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+            - 'docker build -t $DOCKER_USERNAME/flask-app:latest .'
+            - 'docker push $DOCKER_USERNAME/flask-app:latest'
+  - name: Kubernetes deploy
+    task:
+      secrets:
+        - name: kubeconfig
+      jobs:
+        - name: Deploy
+          commands:
+            - checkout
+            - kubectl get nodes
+            - kubectl create namespace "tomfern" || true
+            - kubectl config set-context --current --namespace=tomfern
+            - kubectl apply -f deployment.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app
+  - name: Kubernetes verify
+    task:
+      secrets:
+        - name: kubeconfig
+      jobs:
+        - name: Verify
+          commands:
+            - checkout
+            - kubectl get svc flask-app
+            - kubectl config set-context --current --namespace=tomfern
+            - kubectl get svc flask-app
