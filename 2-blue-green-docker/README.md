@@ -1,18 +1,42 @@
-# Module 6 - Deployment environments
+# Module 6 - Blue/Green on Kubernetes
 
-**Goal**: Learn to perform blue-green deployments with Docker Compose
+**Goal**: Practise blue/green deployments on a k3s cluster by promoting traffic between two Kubernetes Deployments.
 
-## Steps
+## What to review
 
-1. Observe and discuss the following files, how does it manages environments?
+- Application code: `app.py`
+- Container build: `Dockerfile`
+- Kubernetes manifests: `deployment-blue.yml`, `deployment-green.yml`, `service.yml`
 
-- `docker-compose.blue-green.yml`
-- `Dockerfile`
-- `app.py`
+## Preparation
 
-2. Start the blue environment with the following command: `docker compose -f docker-compose.blue-green.yml up blue`
-3. Navigate to localhost:4000, you are in the blue environment
-4. Stop the blue environment using `CTRL+c`
-5. Start the green environment with the following command: `docker compose -f docker-compose.blue-green.yml up green`
-6. Navigate to localhost:4000, you are in the green environment
-7. Stop the blue environment using `CTRL+c`
+1. Pick a unique Kubernetes namespace for your group (for example: `team-sharks`).
+2. Replace the `DOCKER_USERNAME` placeholder in both deployment manifests with your Docker Hub username.
+3. Replace the nodePort in `service-blue.yml` and `service-green.yml` for your team's port (30040 or 30080)
+4. Commit those manifest changes so your pipeline uses the right image repository.
+
+## Exercise tasks
+
+Update the pipeline from exercise 1 to do a blue-green deployment:
+
+1. Keep the first block (**Build and Push Image**)
+2. Block 2 should now **Deploy Blue**
+   - Import the shared `kubeconfig` secret, configure `kubectl`, switch to your groups namespace (`kubectl config set-context --current --namespace="your-chosen-name"`)
+   - Apply `deployment-blue.yml` (`kubectl apply -f deployment-blue.yml`)
+   - Apply `service-blue.yml` (`kubectl apply -f service-blue.yml`)
+   - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app-blue`)
+3. Create a manual promotion (a second pipeline) to deploy green
+4. **Deploy Green**
+   - Import the shared `kubeconfig` secret, configure `kubectl`, switch to your groups namespace (`kubectl config set-context --current --namespace="your-chosen-name"`)
+   - Apply `deployment-green.yml` (`kubectl apply -f deployment-blue.yml`)
+   - Apply `service-green.yml` (`kubectl apply -f service-green.yml`)
+   - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app-green`)
+
+## Verifying the rollout
+
+Visit `http://devops.tomfern.com:30040` after deploying blue and after deploying green
+
+## Semaphore secrets
+
+1. **Docker Hub** — create a secret with `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD`.
+2. **kubeconfig** — already provided by the instructor
