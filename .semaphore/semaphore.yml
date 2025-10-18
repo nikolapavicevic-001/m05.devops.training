@@ -41,4 +41,4 @@ blocks:
           commands:
             - checkout
             - kubectl config set-context --current --namespace=tomfern
-            - kubectl get svc flask-app-blue
+            - kubectl get svc flask-app
