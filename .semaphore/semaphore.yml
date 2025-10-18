@@ -40,6 +40,5 @@ blocks:
         - name: Verify
           commands:
             - checkout
-            - kubectl get svc flask-app
             - kubectl config set-context --current --namespace=tomfern
             - kubectl get svc flask-app
