@@ -1,5 +1,5 @@
 version: v1.0
-name: Initial Pipeline
+name: Blue Deployment
 agent:
   machine:
     type: f1-standard-2
@@ -42,3 +42,6 @@ blocks:
             - checkout
             - kubectl config set-context --current --namespace=tomfern
             - kubectl get svc flask-app
+promotions:
+  - name: Deploy green
+    pipeline_file: pipeline_2.yml
