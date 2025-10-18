@@ -17,6 +17,7 @@ Your goal is to create a Semaphore pipeline that builds the Docker image, pushes
 1. Review `deployment.yml` and `service.yml` so you understand how the application is deployed and exposed.
 2. Pick a unique Kubernetes namespace for your group (for example: `team-sharks`).
 3. Edit `deployment.yml` and replace `DOCKER_USERNAME` with your Docker Hub username
+4. Edit `service.yml` and change `nodePort` to either 30040 or 30080 (each group should pick a different port)
 4. Commit the changes to the repository
 
 ## Exercise tasks
@@ -37,10 +38,9 @@ Define a Semaphore workflow with three blocks:
    - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app`)
 3. **Verify**
    - Retrieve the service information: `kubectl get svc flask-app`
-   - Extract the external address once the load balancer is ready, e.g. `kubectl get svc flask-app --namespace "$TEAM_NAMESPACE" -o jsonpath='{.status.loadBalancer.ingress[0].ip}'`.
-   - Optionally print the full URL as pipeline output for easier access.
+   - Note the `NODE-PORT` value (for example `30040`) from the command output.
 
-When the pipeline finishes, visit `http://<load-balancer-ip>` (replace with the IP or hostname returned in the previous step) to confirm the greeting appears in your browser.
+When the pipeline finishes, visit `http://devops.tomfern.com:<nodePort>` (replace with the worker node address and the NodePort obtained above) to confirm the greeting appears in your browser.
 
 ## Semaphore secrets
 
