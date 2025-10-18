@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app-blue
+  labels:
+    app: flask-app
+    version: blue
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-app
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: flask-app
+        version: blue
+    spec:
+      containers:
+        - name: flask-app
+          image: tomfern/my-flask-image:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ENVIRONMENT
+              value: blue
+            - name: GREETING
+              value: Welcome to the Blue Environment!
+          ports:
+            - containerPort: 4000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 20
