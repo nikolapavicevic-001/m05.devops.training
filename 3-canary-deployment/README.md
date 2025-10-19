@@ -1,6 +1,6 @@
-# Module 6 - Canary on Kubernetes
+# Module 5 - Canary on Kubernetes
 
-**Goal**: Practise a canary rollout on k3s by serving a new version to a small percentage of traffic before promoting it to all users.
+**Goal**: Practise a canary rollout on Kubernetes by serving a new version to a small percentage of traffic before promoting it to all users.
 
 ## What to review
 
@@ -12,38 +12,34 @@
 
 1. Pick a unique Kubernetes namespace for your group (for example: `team-dolphins`).
 2. Replace the `DOCKER_USERNAME` placeholder in both deployment manifests with your Docker Hub username.
-3. Commit those changes so your pipeline references the correct image repository.
+3. Replace the nodePort in `service.yml` for your team's port (30040 or 30080)
+4. Commit those changes so your pipeline references the correct image repository.
 
 ## Exercise tasks
 
-Define a Semaphore workflow with at least three stages that model a canary rollout:
+Update the pipeline from exercise 3 to do a Canary deployment:
 
-1. **Build and Push Image**
-   - Check out the repository.
-   - Build the application image.
-   - Tag it twice: `docker tag <image> DOCKER_USERNAME/my-flask-image:latest` and `DOCKER_USERNAME/my-flask-image:<short-sha>`, where `<short-sha>` is the first seven characters of `SEMAPHORE_GIT_SHA`.
-   - Push both tags to Docker Hub.
-   - Store the fully qualified image reference so later stages can deploy it.
-2. **Deploy Stable Baseline**
-   - Import the shared `kubeconfig` secret and configure `kubectl`.
-   - Ensure your namespace exists: `kubectl create namespace <namespace> || true`.
-   - Apply `service.yml` (once) so traffic flows through a single Service.
-   - Deploy or refresh the stable version: `kubectl apply -f deployment-stable.yml --namespace <namespace>` and update the image to the new tag (`kubectl set image deployment/flask-app-stable flask-app=<image>`).
-   - Wait for the rollout to finish (`kubectl rollout status deployment/flask-app-stable --namespace <namespace>`).
-3. **Roll Out Canary**
-   - Deploy the canary manifest: `kubectl apply -f deployment-canary.yml --namespace <namespace>`.
-   - Update the canary Deployment to the new image tag (`kubectl set image deployment/flask-app-canary flask-app=<image>`).
-   - Scale the canary to 1 replica and the stable deployment to 9 replicas to maintain a 90/10 traffic split (`kubectl scale deployment/flask-app-canary --replicas=1` and `kubectl scale deployment/flask-app-stable --replicas=9`).
-   - Watch the rollout status for both deployments.
-   - (Optional) Add verification commands—`kubectl get pods -l track=canary` and `kubectl logs`—to confirm the new pods are healthy.
-4. **Promotion / Rollback (Optional Challenge)**
-   - Use additional steps or manual commands to scale canary up and stable down for full promotion, or delete the canary deployment to roll back.
+1. Keep the first block (**Build and Push Image**)
+2. Block 2 should now **Deploy Stable**
+   - Import the shared `kubeconfig` secret, configure `kubectl`, switch to your groups namespace (`kubectl config set-context --current --namespace="your-chosen-name"`)
+   - Apply `deployment-stable.yml` (`kubectl apply -f deployment-stable.yml`)
+   - Apply `service.yml` (`kubectl apply -f service.yml`)
+   - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app-stable`)
+3. **Verify Stable**
+   - Retrieve the service information: `kubectl get svc flask-app`
+   - Note the `NODE-PORT` value (for example `30040`) from the command output.
+4. Create a manual promotion (a second pipeline) to deploy canary
+5. **Deploy Canary**
+   - Import the shared `kubeconfig` secret, configure `kubectl`, switch to your groups namespace (`kubectl config set-context --current --namespace="your-chosen-name"`)
+   - Apply `deployment-canary.yml` (`kubectl apply -f deployment-canary.yml`)
+   - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app-canary`)
+6. **Verify Canary**
+   - Retrieve the service information: `kubectl get svc flask-app`
+   - Note the `NODE-PORT` value (for example `30040`) from the command output.
 
-## Verifying traffic
+## Verifying the rollout manually
 
-1. Retrieve the Service details: `kubectl get svc flask-app --namespace <namespace>`.
-2. Note the NodePort (defaults to `30082`) and list node IPs using `kubectl get nodes -o wide`.
-3. Visit `http://<node-ip>:<node-port>` repeatedly or run a loop with `curl`; you should see the stable greeting most of the time with occasional canary responses. Adjust replica counts to change the traffic split.
+Visit `http://devops.tomfern.com:30040` (or 30080) after deploying stable and canary, you should see the canary application about 1/6th of the times
 
 ## Semaphore secrets
 

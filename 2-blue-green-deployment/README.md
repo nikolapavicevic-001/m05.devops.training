@@ -1,4 +1,4 @@
-# Module 6 - Blue/Green on Kubernetes
+# Module 5 - Blue/Green on Kubernetes
 
 **Goal**: Practise blue/green deployments on a k3s cluster by promoting traffic between two Kubernetes Deployments.
 
@@ -25,16 +25,23 @@ Update the pipeline from exercise 1 to do a blue-green deployment:
    - Apply `deployment-blue.yml` (`kubectl apply -f deployment-blue.yml`)
    - Apply `service-blue.yml` (`kubectl apply -f service-blue.yml`)
    - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app-blue`)
-3. Create a manual promotion (a second pipeline) to deploy green
-4. **Deploy Green**
+3. **Verify Blue**
+   - Retrieve the service information: `kubectl get svc flask-app`
+   - Note the `NODE-PORT` value (for example `30040`) from the command output.
+4. Create a manual promotion (a second pipeline) to deploy green
+5. **Deploy Green**
    - Import the shared `kubeconfig` secret, configure `kubectl`, switch to your groups namespace (`kubectl config set-context --current --namespace="your-chosen-name"`)
    - Apply `deployment-green.yml` (`kubectl apply -f deployment-blue.yml`)
    - Apply `service-green.yml` (`kubectl apply -f service-green.yml`)
    - Wait for the rollout to complete (`kubectl rollout status deployment/flask-app-green`)
+6. **Verify Green**
+   - Retrieve the service information: `kubectl get svc flask-app`
+   - Note the `NODE-PORT` value (for example `30040`) from the command output.
 
-## Verifying the rollout
+## Verifying the rollout manually
 
-Visit `http://devops.tomfern.com:30040` after deploying blue and after deploying green
+1. Visit `http://devops.tomfern.com:30040` (or 30080) after deploying blue, you should see the message: "Greetings from Blue"
+2. Visit `http://devops.tomfern.com:30040` (or 30080) after deploying green, you should see the message: "Greetings from Green"
 
 ## Semaphore secrets
 
