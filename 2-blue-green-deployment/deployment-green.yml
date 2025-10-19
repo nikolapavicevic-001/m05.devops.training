@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app-green
+  labels:
+    app: flask-app
+    version: green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-app
+      version: green
+  template:
+    metadata:
+      labels:
+        app: flask-app
+        version: green
+    spec:
+      containers:
+        - name: flask-app
+          image: DOCKER_USERNAME/my-flask-image:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ENVIRONMENT
+              value: green
+            - name: GREETING
+              value: Welcome to the Green Environment!
+          ports:
+            - containerPort: 4000
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 4000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 20
