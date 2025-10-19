@@ -1,26 +1,26 @@
 version: v1.0
-name: Green deployment
+name: Pipeline 2
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: 'Block #1'
+  - name: Deploy canary
     task:
       jobs:
-        - name: Green deployment
+        - name: Deploy
           commands:
             - checkout
-            - cd 2-blue-green-docker
+            - cd 3-canary-deployment
             - kubectl get nodes
             - '#kubectl create namespace "tomfern" || true'
             - kubectl config set-context --current --namespace=tomfern
-            - kubectl apply -f deployment-green.tomfern.yml
-            - kubectl apply -f service-green.yml
-            - kubectl rollout status deployment/flask-app-green
+            - kubectl apply -f deployment-canary.tomfern.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app-canary
       secrets:
         - name: kubeconfig
-  - name: 'Block #2'
+  - name: Verify canary
     task:
       secrets:
         - name: kubeconfig
