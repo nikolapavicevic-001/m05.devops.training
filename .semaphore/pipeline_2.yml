@@ -29,4 +29,4 @@ blocks:
           commands:
             - checkout
             - kubectl config set-context --current --namespace=tomfern
-            - kubectl get svc flask-app-canary
+            - kubectl get svc flask-app

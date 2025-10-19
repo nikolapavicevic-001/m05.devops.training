@@ -29,7 +29,7 @@ blocks:
           commands:
             - checkout
             - kubectl config set-context --current --namespace=tomfern
-            - kubectl get svc flask-app-stable
+            - kubectl get svc flask-app
 promotions:
   - name: Deploy canary
     pipeline_file: pipeline_2.yml
