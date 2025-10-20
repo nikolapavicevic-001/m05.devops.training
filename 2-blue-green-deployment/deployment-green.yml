@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: flask-app
-          image: DOCKER_USERNAME/my-flask-image:latest
+          image: legionalac/my-flask-image:latest
           imagePullPolicy: IfNotPresent
           env:
             - name: ENVIRONMENT
