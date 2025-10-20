@@ -8,7 +8,7 @@ blocks:
   - name: Build and Push image
     task:
       jobs:
-        - name: 'Job #1'
+        - name: Build and Push
           commands:
             - cd 1-deployment/
             - echo $DOCKER_PASSWORD | docker login --username "$DOCKER_USERNAME" --password-stdin
@@ -18,3 +18,18 @@ blocks:
       prologue:
         commands:
           - checkout
+      secrets:
+        - name: DockerHub
+  - name: Deploy to Kubernetes
+    task:
+      secrets:
+        - name: kubeconfig
+      jobs:
+        - name: Deploy to Kubernetes
+          commands:
+            - kubectl create namespace "maradona" || true
+            - kubectl config set-context --current --namespace="maradona"
+            - kubectl apply -f deployment.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app
+            - kubectl get svc flask-app
