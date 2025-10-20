@@ -5,9 +5,16 @@ agent:
     type: f1-standard-2
     os_image: ubuntu2204
 blocks:
-  - name: 'Block #1'
+  - name: Build and Push image
     task:
       jobs:
         - name: 'Job #1'
           commands:
-            - checkout
+            - cd 1-deployment/
+            - echo $DOCKER_PASSWORD | docker login --username "$DOCKER_USERNAME" --password-stdin
+            - 'docker build -t semaphore_test:${SEMAPHORE_WORKFLOW_ID} .'
+            - 'docker tag semaphore_test:${SEMAPHORE_WORKFLOW_ID} "$DOCKER_USERNAME"/semaphore_test'
+            - docker push "$DOCKER_USERNAME"/semaphore_test
+      prologue:
+        commands:
+          - checkout
