@@ -32,7 +32,7 @@ blocks:
             - kubectl config set-context --current --namespace="maradona"
             - kubectl apply -f deployment-blue.yml
             - kubectl apply -f service-blue.yml
-            - kubectl rollout status deployment/flask-app-blue
+            - kubectl rollout status deployment/flask-app
             - kubectl get svc flask-app-blue
       prologue:
         commands:
@@ -50,5 +50,5 @@ blocks:
             - kubectl config set-context --current --namespace="maradona"
             - kubectl apply -f deployment-green.yml
             - kubectl apply -f service-green.yml
-            - kubectl rollout status deployment/flask-app-green
+            - kubectl rollout status deployment/flask-app
             - kubectl get svc flask-app-green
