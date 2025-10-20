@@ -27,6 +27,7 @@ blocks:
       jobs:
         - name: Deploy to Kubernetes
           commands:
+            - cd 1-deployment/
             - kubectl create namespace "maradona" || true
             - kubectl config set-context --current --namespace="maradona"
             - kubectl apply -f deployment.yml
