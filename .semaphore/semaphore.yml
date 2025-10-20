@@ -12,9 +12,9 @@ blocks:
           commands:
             - cd 1-deployment/
             - echo $DOCKER_PASSWORD | docker login --username "$DOCKER_USERNAME" --password-stdin
-            - 'docker build -t semaphore_test:${SEMAPHORE_WORKFLOW_ID} .'
-            - 'docker tag semaphore_test:${SEMAPHORE_WORKFLOW_ID} "$DOCKER_USERNAME"/semaphore_test'
-            - docker push "$DOCKER_USERNAME"/semaphore_test
+            - 'docker build -t my-flask-image:${SEMAPHORE_WORKFLOW_ID} .'
+            - 'docker tag my-flask-image:${SEMAPHORE_WORKFLOW_ID} "$DOCKER_USERNAME"/my-flask-image'
+            - docker push "$DOCKER_USERNAME"/my-flask-image
       prologue:
         commands:
           - checkout
