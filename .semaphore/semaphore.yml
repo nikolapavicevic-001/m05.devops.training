@@ -10,7 +10,7 @@ blocks:
       jobs:
         - name: Build and Push
           commands:
-            - cd 1-deployment/
+            - cd 2-blue-green-deployment/
             - echo $DOCKER_PASSWORD | docker login --username "$DOCKER_USERNAME" --password-stdin
             - 'docker build -t my-flask-image:${SEMAPHORE_WORKFLOW_ID} .'
             - 'docker tag my-flask-image:${SEMAPHORE_WORKFLOW_ID} "$DOCKER_USERNAME"/my-flask-image'
@@ -20,20 +20,35 @@ blocks:
           - checkout
       secrets:
         - name: DockerHub
-  - name: Deploy to Kubernetes
+  - name: Blue deployment
     task:
       secrets:
         - name: kubeconfig
       jobs:
-        - name: Deploy to Kubernetes
+        - name: Blue deployment
           commands:
-            - cd 1-deployment/
+            - cd 2-blue-green-deployment/
             - kubectl create namespace "maradona" || true
             - kubectl config set-context --current --namespace="maradona"
-            - kubectl apply -f deployment.yml
-            - kubectl apply -f service.yml
-            - kubectl rollout status deployment/flask-app
-            - kubectl get svc flask-app
+            - kubectl apply -f deployment-blue.yml
+            - kubectl apply -f service-blue.yml
+            - kubectl rollout status deployment/flask-app-blue
+            - kubectl get svc flask-app-blue
       prologue:
         commands:
           - checkout
+  - name: Green deployment
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: Green deployment
+          commands:
+            - cd 2-blue-green-deployment/
+            - kubectl create namespace "maradona" || true
+            - kubectl config set-context --current --namespace="maradona"
+            - kubectl apply -f deployment-green.yml
+            - kubectl apply -f service-green.yml
+            - kubectl rollout status deployment/flask-app-green
+            - kubectl get svc flask-app-green
