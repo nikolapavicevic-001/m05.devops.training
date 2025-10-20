@@ -20,37 +20,23 @@ blocks:
           - checkout
       secrets:
         - name: DockerHub
-  - name: Blue deployment
+  - name: Stable deployment
     task:
       secrets:
         - name: kubeconfig
       jobs:
-        - name: Blue deployment
+        - name: Stable
           commands:
-            - cd 2-blue-green-deployment/
+            - cd 3-canary-deployment/
             - kubectl create namespace "maradona" || true
             - kubectl config set-context --current --namespace="maradona"
-            - kubectl apply -f deployment-blue.yml
-            - kubectl apply -f service-blue.yml
-            - kubectl rollout status deployment/flask-app
+            - kubectl apply -f deployment-stable.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app-stable
             - kubectl get svc flask-app
       prologue:
         commands:
           - checkout
-  - name: Green deployment
-    task:
-      prologue:
-        commands:
-          - checkout
-      jobs:
-        - name: Green deployment
-          commands:
-            - cd 2-blue-green-deployment/
-            - kubectl create namespace "maradona" || true
-            - kubectl config set-context --current --namespace="maradona"
-            - kubectl apply -f deployment-green.yml
-            - kubectl apply -f service-green.yml
-            - kubectl rollout status deployment/flask-app
-            - kubectl get svc flask-app
-      secrets:
-        - name: kubeconfig
+promotions:
+  - name: Promotion 1
+    pipeline_file: pipeline_2.yml

@@ -1,0 +1,24 @@
+version: v1.0
+name: Canary deployment
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+blocks:
+  - name: Canary deployment
+    task:
+      jobs:
+        - name: Canary deployment
+          commands:
+            - cd 3-canary-deployment/
+            - kubectl create namespace "maradona" || true
+            - kubectl config set-context --current --namespace="maradona"
+            - kubectl apply -f deployment-canary.yml
+            - kubectl apply -f service.yml
+            - kubectl rollout status deployment/flask-app-canary
+            - kubectl get svc flask-app
+      secrets:
+        - name: kubeconfig
+      prologue:
+        commands:
+          - checkout
