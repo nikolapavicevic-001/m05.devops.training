@@ -34,3 +34,6 @@ blocks:
             - kubectl apply -f service.yml
             - kubectl rollout status deployment/flask-app
             - kubectl get svc flask-app
+      prologue:
+        commands:
+          - checkout
